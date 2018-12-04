@@ -8,6 +8,7 @@ import sys
 
 
 class Node:
+    # node class is used to represent decision tree
     def __init__(self, attribute,val):
         self.lower = None
         self.biggerOrEqual = None
@@ -26,6 +27,7 @@ class Node:
             print str(node) + '\n'
 
 def calculate_entropy(dataset):
+    # calculate entropy of 4 target classes dor this dataset
     n_size = len(dataset)
 
     if n_size==0:
@@ -55,6 +57,7 @@ def calculate_entropy(dataset):
 
 
 def find_max_gain_attribuute(dataset):
+    # find the best attribute with the right split for the current dataset
     # calculate base entropy
     base_entropy = calculate_entropy(dataset)
     n = len(dataset)
@@ -84,7 +87,7 @@ def find_max_gain_attribuute(dataset):
             upperEntropy = calculate_entropy(upperSet)
 
 
-
+            # calculate current Information gain = parrent entropy-childs entrropy
             IG = base_entropy-(n_lower*1.0/n)*lowerEntropy-(n_upper*1.0/n)*upperEntropy
 
             if IG>best_IG:
@@ -98,14 +101,13 @@ def find_max_gain_attribuute(dataset):
 
     return [best_attribute, best_split_threshold]
 
-# def terminate_node():
-#
-# def decision_tree(,max_depth)
+
 
 def check_pure(dataset):
+    # calculate the concentrate of the best target classes
+    # return the target class and the percent in the dataset
     n_size = len(dataset)
-    # if n_size == 0.0:
-    #     return -2
+
     n_1 = len(dataset[dataset["Y"] == 1])
     n_2 = len(dataset[dataset["Y"]== 2])
     n_3 = len(dataset[dataset["Y"] == 3])
@@ -121,11 +123,11 @@ def check_pure(dataset):
     return [4,r]
 
 def create_terminate_leaf_node(value,depth):
+    # generate terminate node when the dataset can not be split anymore
     res = Node("",value)
     res.depth = depth
     res.lower = None
     res.biggerOrEqual = None
-    # print "leaf Node : ",1
     return res
 
 def no_more_split(dataset):
@@ -133,6 +135,10 @@ def no_more_split(dataset):
 
 
 def recursiveSplit(dataset,depth,maxDepth):
+    # generate a decision tree by perform 3 steps
+    # pick the best attribute
+    # split into 2 dataset with the attribute
+    # run recursive in each sub dataset
     if len(dataset) == 0:
         return None
 
@@ -167,7 +173,7 @@ def recursiveSplit(dataset,depth,maxDepth):
     return res
 
 def findInfo(model):
-    # if (isinstance(model, (int))):
+    # print information of the decision tree
     if (model.currentAttribute == "" and model.lower == None and model.biggerOrEqual == None):
         return [model.depth, model.depth, model.depth, 1, 1]
 

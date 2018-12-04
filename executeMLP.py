@@ -7,11 +7,6 @@ from matplotlib.colors import ListedColormap
 import sys
 
 
-profit_tablepro = [[ 20, -7,-7,-7],
-          [-7,15,-7,-7],
-          [-7,-7,5,-7],
-          [-3,-3,-3,-3]
-]
 
 def sigmoid(sum):
     return 1/(1+np.exp(-sum))
@@ -20,7 +15,6 @@ def create_confusion_matrix(y,y_pred):
     print('Confusion Matrix')
     print(confusion_matrix(y, y_pred))
     print('Classification Report')
-    # target_names = ['Cats', 'Dogs', 'Horse']
     t = ["Bolt","Nut","ring","Scrap"]
     labels = np.array(t)
     print(classification_report(y, y_pred, target_names=labels))
@@ -29,7 +23,6 @@ def evaluate(y,predict):
     accurate = 0
     for i in range(len(predict)):
         if predict[i] == y[i][0]:
-            # print "yes"
             accurate+=1
     print "the accuracy is :",(accurate*1.0/len(predict)),"% "
 
@@ -41,6 +34,7 @@ def calculate_profit(y,predict,profitTable):
 
 
 def predict_result(test_input,W):
+    # do prediction
     W1 = W['W1']
     W1 = np.array(W1)
     b1 = W['b1']
@@ -61,12 +55,14 @@ def predict_result(test_input,W):
 
 
 def produce_result_predictions(data,predict,W):
+    # generate decision bound graph
+
     columns1 = ["X1", "X2"]
     X = data[columns1].values
     y = data["Y"].values
 
     marker = {1: 'x', 2: 'o', 3: '^', 4: 'v'}
-    colors = ['red', 'blue', 'lightgreen', 'lightyellow', 'cyan']
+    colors = ['red', 'blue', 'lightgreen', 'black', 'cyan']
 
     cmap = ListedColormap(colors[:len(np.unique(y))])
 
@@ -90,7 +86,6 @@ def produce_result_predictions(data,predict,W):
     ax_c.set_ticks([0, .25, .5, .75, 1])
 
     cdict = {1: 'red', 2: 'blue', 3: 'green',4:'yellow'}
-    # predict_labels = {1:'Bolt predict',2:'Nut predict',3:'Ring predict',4:'Scrap predict'}
     actual_labels = {1:'Bolt actual',2:'Nut actual',3:'Ring actual',4:'Scrap actual'}
 
 
@@ -109,8 +104,18 @@ def produce_result_predictions(data,predict,W):
     plt.show()
 
 
+profit_tablepro = [[ 20, -7,-7,-7],
+          [-7,15,-7,-7],
+          [-7,-7,5,-7],
+          [-3,-3,-3,-3]
+]
+
+
+# test file
 fileName = sys.argv[1]
+# weight file for neural network
 wFileName = sys.argv[2]
+# load test input
 test_input = pd.read_csv(fileName,names = ["X1","X2","Y"])
 
 test_data = test_input.iloc[:,0:2].values
@@ -123,11 +128,16 @@ f.close()
 
 
 
-
+# calculate prediction
 y_pred = predict_result(test_data,W)
 
+# calculate accuracy
 evaluate(test_labels,y_pred)
+
+# make confusion matrix
 create_confusion_matrix(test_labels,y_pred)
+
+# calculte profit for prediction
 calculate_profit(test_labels,y_pred,profit_tablepro)
-# generate_plot(test_input,test_labels,y_pred)
+# generate decision boundary
 produce_result_predictions(test_input,y_pred,W)

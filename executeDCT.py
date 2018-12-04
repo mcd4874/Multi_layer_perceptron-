@@ -1,17 +1,12 @@
 import numpy as np
 import pandas as pd
-import math
 import pickle
 from sklearn.metrics import confusion_matrix,classification_report
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
 import sys
 
-profit_tablepro = [[ 20, -7,-7,-7],
-          [-7,15,-7,-7],
-          [-7,-7,5,-7],
-          [-3,-3,-3,-3]
-]
+
 
 class Node:
     def __init__(self, attribute,val):
@@ -33,18 +28,16 @@ class Node:
 
 
 def use_train_model(model,row):
-    # if (isinstance(model, (int))):
+    # make decision prediction for each row by go through the tree
     if (model.currentAttribute == "" and model.lower == None and model.biggerOrEqual == None ):
-        # print "result at this predict :",model
         return model.currentSplit
-    # print row[model.currentAttribute]
-    # print model.currentSplit
     if row[model.currentAttribute]>=model.currentSplit:
         return use_train_model(model.biggerOrEqual,row)
     else:
         return use_train_model(model.lower, row)
 
 def evaluate(y,predict):
+    # evaluate the accuracy level
     accurate = 0
     for i in range(len(predict)):
         if predict[i] == y[i]:
@@ -56,10 +49,10 @@ def evaluate(y,predict):
 
 
 def create_confusion_matrix(y,y_pred):
+    # create confusion matrix
     print('Confusion Matrix')
     print(confusion_matrix(y, y_pred))
     print('Classification Report')
-    # target_names = ['Cats', 'Dogs', 'Horse']
     t = ["Bolt", "Nut", "ring", "Scrap"]
     labels = np.array(t)
     print(classification_report(y, y_pred, target_names=labels))
@@ -67,6 +60,7 @@ def create_confusion_matrix(y,y_pred):
 
 
 def calculate_profit(y,predict,profitTable):
+    # calculate total profit for the prediction
     totalProfit = 0
     for i in range(len(predict)):
         totalProfit+= profitTable[y[i]-1][int(predict[i])-1]
@@ -74,12 +68,15 @@ def calculate_profit(y,predict,profitTable):
 
 
 def predict_result(test_data,model):
+    # calculate prediction from decision tree model and test input
     y_pred = np.zeros(len(test_data))
     for index, row in test_data.iterrows():
         y_pred[index] = int(use_train_model(model, row))
     return y_pred
 
 def produce_result_predictions(data,predict,model):
+    # generate decision bound graph
+
     columns1 = ["X1", "X2"]
     X = data[columns1].values
     y = data["Y"].values
@@ -105,11 +102,9 @@ def produce_result_predictions(data,predict,model):
     f, ax = plt.subplots(figsize=(8, 6))
     contour = ax.contourf(xx, yy, Z, alpha=0.4, cmap=cmap)
     ax_c = f.colorbar(contour)
-    # ax_c.set_label("$P(y = 1)$")
     ax_c.set_ticks([0, .25, .5, .75, 1])
 
-    cdict = {1: 'red', 2: 'blue', 3: 'green',4:'yellow'}
-    # predict_labels = {1:'Bolt predict',2:'Nut predict',3:'Ring predict',4:'Scrap predict'}
+    cdict = {1: 'red', 2: 'blue', 3: 'green',4:'black'}
     actual_labels = {1:'Bolt actual',2:'Nut actual',3:'Ring actual',4:'Scrap actual'}
 
 
@@ -132,15 +127,28 @@ def test(test_input,y_pred,profit_table):
     evaluate(test_input.Y.values,y_pred)
     calculate_profit(test_input.Y,y_pred,profit_table)
 
-fileName = sys.argv[1]
-modelFileName = sys.argv[2]
+# profit table for 4 targets classes
+profit_tablepro = [[ 20, -7,-7,-7],
+          [-7,15,-7,-7],
+          [-7,-7,5,-7],
+          [-3,-3,-3,-3]
+]
 
-test_input = pd.read_csv('test_data.csv',names = ["X1","X2","Y"])
+# test file name
+fileName = sys.argv[1]
+# model file name
+modelFileName = sys.argv[2]
+# load test data
+test_input = pd.read_csv(fileName,names = ["X1","X2","Y"])
 
 filehandler = open(modelFileName, 'r')
+
+# load model
 model = pickle.load(filehandler)
 
+# generate predictions for test input
 y_pred = predict_result(test_input,model)
 
 test(test_input,y_pred,profit_tablepro)
+# create the decision bound graph
 produce_result_predictions(test_input,y_pred,model)
