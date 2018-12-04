@@ -2,9 +2,9 @@ import numpy as np
 import pandas as pd
 import math
 import pickle
+import sys
 
 
-data_input = pd.read_csv('train_data.csv',names = ["X1","X2","Y"])
 
 
 class Node:
@@ -166,10 +166,6 @@ def recursiveSplit(dataset,depth,maxDepth):
         res.biggerOrEqual = upperResult
     return res
 
-
-
-result = recursiveSplit(data_input,0,6)
-
 def findInfo(model):
     # if (isinstance(model, (int))):
     if (model.currentAttribute == "" and model.lower == None and model.biggerOrEqual == None):
@@ -180,11 +176,15 @@ def findInfo(model):
 
     return [max(lower_maxDepth,b_maxDepth),min(lower_minDepth,b_minDepth),lower_totalDepth+b_totalDepth,lower_totalNode+b_totalNode+1,lower_totalLeafNode+b_totalLeafNode]
 
-    # return [maxDepth,minDepth,totalDepth,totalNode,totalLeafNode]
+trainFile = sys.argv[1]
+data_input = pd.read_csv(trainFile,names = ["X1","X2","Y"])
+result = recursiveSplit(data_input,0,6)
 
 
 
-file_pi = open('filename_pi.obj', 'w')
+
+
+file_pi = open('decisionTreeModel.obj', 'w')
 pickle.dump(result, file_pi)
 max_depth,min_depth,total_depth,total_node,total_leaf_node = findInfo(result)
 print "Max depth : ",max_depth

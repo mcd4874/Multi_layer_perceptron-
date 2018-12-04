@@ -3,7 +3,7 @@ import pandas as pd
 import json
 
 # Make it work for Python 2+3 and with Unicode
-import io
+import sys
 import matplotlib.pyplot as plt
 
 def compute_multiclass_loss(Y, Y_hat):
@@ -38,8 +38,8 @@ def rmse(predictions, targets):
 
 epochs = 10001
 
-data_input = pd.read_csv('train_data.csv',names = ["X1","X2","Y"])
-test_input = pd.read_csv('test_data.csv',names = ["X1","X2","Y"])
+trainFileName = sys.argv[1]
+data_input = pd.read_csv(trainFileName,names = ["X1","X2","Y"])
 training_data = data_input.iloc[:,0:2].values
 # print training_data
 training_labels = data_input.iloc[:,2:3].values
@@ -49,13 +49,6 @@ for i in range (training_labels.shape[0]):
     training_labels_onehot[i, training_labels[i]] = 1
 
 
-test_data = test_input.iloc[:,0:2].values
-# print test_data
-test_labels = test_input.iloc[:,2:3].values
-# test_labels = np.subtract(test_labels,1)
-# test_labels_onehot = np.zeros((test_labels.shape[0], 4)).astype(int)
-# for i in range (test_labels.shape[0]):
-#     test_labels_onehot[i, test_labels[i]] = 1
 
 
 X_train = training_data
@@ -106,9 +99,7 @@ for i in range(epochs):
     W2 = W2 - learning_rate * dW2
     b2 = b2 - learning_rate * db2
     W1 = W1 - learning_rate * dW1
-    # print "shape of bias 1: ", b1.shape
     b1 = b1 - learning_rate * db1
-    # print "shape of bias 1: ", b1.shape
 
     if (i in [0, 10, 100, 1000, 10000]):
         w1 =W1.tolist()
